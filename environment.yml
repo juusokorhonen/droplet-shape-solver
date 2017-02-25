@@ -1,0 +1,10 @@
+name: droplet-solver
+channels:
+  - conda-forge
+dependencies:
+  - python=2.7
+  - matplotlib
+  - scipy
+  - seaborn
+  - bokeh
+  - numpy
