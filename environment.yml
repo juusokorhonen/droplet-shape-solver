@@ -3,8 +3,9 @@ channels:
   - conda-forge
 dependencies:
   - python=2.7
-  - matplotlib
+  - numpy
   - scipy
+  - jupyter
+  - matplotlib
   - seaborn
   - bokeh
-  - numpy

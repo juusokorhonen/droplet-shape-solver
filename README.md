@@ -21,4 +21,5 @@ Simple Young-Laplace equation solver for small droplets
 
 ## Run Jupyter notebook
 
+	$ cd content
 	$ jupyter notebook
