@@ -4,6 +4,12 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+pytest = "*"
+pytest-pycodestyle = "*"
+setuptools = "*"
+wheel = "*"
+twine = "*"
+flake8 = "*"
 
 [packages]
 scipy = "*"
@@ -14,4 +20,4 @@ seaborn = "*"
 bokeh = "*"
 
 [requires]
-python_version = "3.7"
+python_version >= "3.7"
