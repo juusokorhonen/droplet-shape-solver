@@ -3,23 +3,22 @@ Simple Young-Laplace equation solver for small droplets
 
 ## Installation
 
-### Using Conda in OSX
+### Pyenv + Pipenv
 
-	$ conda env create -f environment.yml
+* Install [Pyenv](https://github.com/pyenv/pyenv#installation).
 
-	$ source activate droplet-solver
+* Install [Pipenv](https://pipenv.pypa.io/en/latest/install/#installing-pipenv).
 
-### Using virtualenv
+* Set python version:
 
-	$ pip install virtualenv
+	$ pyenv local miniconda3-latest
+	
+* Install environment
 
-	$ virtualenv -p /usr/bin/python2.7 venv
+	$ pipenv install
 
-	$ source venv/bin/activate
-
-	$ pip install -r requirements.txt
 
 ## Run Jupyter notebook
 
 	$ cd content
-	$ jupyter notebook
+	$ pipenv run jupyter notebook
