@@ -77,13 +77,13 @@ def simulate_droplet_shape(R0, ca_target=180.0):
         Right side of droplet shape as ndarray.
     """
     R0 = as_quantity(R0, 'm')
-    ca_target = as_quantity(ca_target, 'radians')
+    ca_target = as_quantity(ca_target, 'degrees')
 
     #lambda_c = capillary_length(drho=rho_water, g=g, gamma=gamma_water)
     # Eo = eotvos_number(R0, lambda_c)
 
     #P0 = 2 * lambda_c.magnitude / R0.magnitude
-    ca_target = ca_target.magnitude
+    ca_target = np.deg2rad(ca_target)
 
     # Set up parameters for model
     sigma = gamma_water.magnitude
@@ -95,7 +95,7 @@ def simulate_droplet_shape(R0, ca_target=180.0):
 
     solution_right = sp.integrate.solve_ivp(
         adams_bashforth_derivative,
-        (0, pi), (0, 0),
+        (0, ca_target.magnitude), (0, 0),
         args=(alpha, beta, gamma), method='BDF')
 
     return solution_right
