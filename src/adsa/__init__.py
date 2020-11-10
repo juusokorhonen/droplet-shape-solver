@@ -3,9 +3,13 @@
 from . import units
 from . import solver
 from . import visualisation
+from . import analysis
+from . import threed
 
 __all__ = [
     units,
     solver,
-    visualisation
+    visualisation,
+    analysis,
+    threed
 ]

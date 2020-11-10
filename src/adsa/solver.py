@@ -7,11 +7,11 @@ import scipy.optimize
 import numpy as np
 from .units import (Quantity, as_quantity, as_scalar,
                     g, rho_water, rho_air, gamma_water, pi,
-                    eotvos_number, capillary_length)
+                    eotvos_number, capillary_length, ureg)
 
 
 @numba.jit(nopython=True)
-def adams_bashforth_derivative(phi, Y, alpha, beta, gamma):
+def adams_bashforth_derivative(phi, Y, beta, alpha=0.0, gamma=2.0):
     """
     Calculates the derivate of the Young-Laplace equation using Adams-Bashforth formalism.
     These equations are solved in the non-dimensional form.
@@ -19,11 +19,36 @@ def adams_bashforth_derivative(phi, Y, alpha, beta, gamma):
     Parameters
     ----------
     phi: scalar (radians)
-        integration parameter, angle calculated from vertical axis
+        Integration parameter, angle calculated from vertical axis.
+        This should be set to [0, ca] when calling the solver function.
     Y: np.ndarray (n, )
-        An array of dimensionless vectors X (dimensionless), Z (dimensionless).
-    P0: scalar (dimensionless)
-        Non-dimensional pressure at the top of the droplet.
+        An array of dimensionless vectors `X` (dimensionless) = x/r,
+        `Z` (dimensionless) = z/r, where r is the radius of curvature at the top
+        of the droplet.
+    beta: scalar (dimensionless)
+        Dimensionless parameter, which describes the capillary length of the
+        droplet. `beta` = drho * g * r^2 / sigma, where drho is the difference of
+        densities of the liquid and vapour phases, g is gravitational constant,
+        r is the radius of curvature at the top of the droplet, and sigma is the
+        surface tension of the liquid. (Note. sigma is more specifically the
+        surface tension on a planar surface.)
+    alpha: scalar (dimensionless), optional, default = 0.0
+        Dimensionless parameter, which relates the thickness of the interface
+        "gamma" to the specific size, which is typically the radius of curvature
+        at the top of the droplet. `alpha` = gamma / r. (Note: "gamma" here is not
+        the surface tension). Note setting `alpha` = 0, will effectively ignore
+        curvature dependence of surface tension.
+    gamma: scalar (dimensionless), optional, default = 2.0
+        Dimensionless parameter, which is calculated from `alpha`. It is the
+        correction term to the Young-Laplace equation for highly curved
+        surfaces.
+
+        .. math:: 
+            \Delta p = \frac{2\sigma}{r}\left(1-\frac{\delta}{r}+\ldots\right)
+
+        gamma = 2 / (1+2 * `alpha`). Note: when `alpha` = 0 (ie. ignoring
+        curvature dependence of surface tension), `gamma` = 2. These values can
+        be used as defaults, when `delta` is unknown.
 
     Returns
     -------
@@ -39,15 +64,19 @@ def adams_bashforth_derivative(phi, Y, alpha, beta, gamma):
     the Theoretical and Measured Forms of Drops of Fluid" by Francis
     Bashforth and J. C. Adams, Cambridge University Press 1883.
 
+    Further details can be found from:
+    Rekhviashvili and Sokurov, Turk. J. Phys (2018), 42, 699-705.
+
     Dimensionless values X, Z, and P are defined by:
-        X = x/lambda_c
-        Z = z/lambda_c
-        P0 = 2*lambda_c/R0
+        Y = [X, Z]
+        X = x/r
+        Z = z/r
+
+    For ignoring the curvature dependence of surface tension (ie. for anything
+    that is on the order of millimeters), you can set `alpha`=0 and `gamma`=2.
     """
     (X, Z) = Y   # non-dimensional coordinates
 
-    # This value is re-used in both following eqs
-    #k = X / (X * (Z + P0) - np.sin(phi)) if (phi != 0 or X != 0) else 1/(P0-1)
     k1 = gamma + beta * Z
     sinphi = np.sin(phi)
     cosphi = np.cos(phi)
@@ -66,7 +95,7 @@ def simulate_droplet_shape(R0, ca_target=180.0):
 
     Parameters
     ----------
-    R0: scalar (m) or Quantity
+    R0: scalar (in meters) or Quantity
         Radius of curvature at the top of the droplet.
     ca_target: scalar (degrees) or Quantity
         Targeted contact angle. Used to trigger events in the solver.
@@ -78,16 +107,12 @@ def simulate_droplet_shape(R0, ca_target=180.0):
     """
     R0 = as_quantity(R0, 'm')
     ca_target = as_quantity(ca_target, 'degrees')
-
-    #lambda_c = capillary_length(drho=rho_water, g=g, gamma=gamma_water)
-    # Eo = eotvos_number(R0, lambda_c)
-
-    #P0 = 2 * lambda_c.magnitude / R0.magnitude
     ca_target = np.deg2rad(ca_target)
 
     # Set up parameters for model
     sigma = gamma_water.magnitude
-    delta = Quantity(0, 'm')   # Tolman length, 0 = ignore curvature dependence of surface tension
+    # Tolman length, 0 = ignore curvature dependence of surface tension
+    delta = Quantity(0, 'm')
     alpha = (delta / R0).magnitude
     drho = (rho_water - rho_air).magnitude
     beta = (drho * g * R0 ** 2 / sigma).magnitude
@@ -96,6 +121,6 @@ def simulate_droplet_shape(R0, ca_target=180.0):
     solution_right = sp.integrate.solve_ivp(
         adams_bashforth_derivative,
         (0, ca_target.magnitude), (0, 0),
-        args=(alpha, beta, gamma), method='BDF')
+        args=(beta, alpha, gamma), method='BDF')
 
     return solution_right
