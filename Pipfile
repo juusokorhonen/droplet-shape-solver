@@ -10,7 +10,6 @@ setuptools = "*"
 wheel = "*"
 twine = "*"
 flake8 = "*"
-pep517 = "*"
 
 [packages]
 scipy = "*"

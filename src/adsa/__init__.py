@@ -6,6 +6,8 @@ from . import visualisation
 from . import analysis
 from . import threed
 
+VERSION = "0.0.1"
+
 __all__ = [
     units,
     solver,
