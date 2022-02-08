@@ -30,7 +30,7 @@ You can use anything over Python 3.7.4. I recommend either "miniconda3-latest" o
 
 Regardless of the Python version, you should run these commands.
 
-  python -m pip install --upgrade pip setuptools wheel virtualenv
+  python -m pip install --upgrade pip setuptools wheel virtualenv py-make
   python -m virtualenv venv
   source venv/bin/activate
   python -m pip install -r requirements.txt -r requirements-dev.txt -r requirements-extras.txt
@@ -45,7 +45,7 @@ Make sure you have a proper Python installed with the `py` wrapper. Here, I assu
 
 Run these commands in the root folder of the project (ie. the folder wher this README.md file is).
 
-  py -3.7 -m pip install --upgrade pip setuptools wheel virtualenv
+  py -3.7 -m pip install --upgrade pip setuptools wheel virtualenv py-make
   py -3.7 -m virtualenv venv
   source venv/Scripts/activate
   python -m pip install -r requirements.txt -r requirements-dev.txt -r requirements-extras.txt
