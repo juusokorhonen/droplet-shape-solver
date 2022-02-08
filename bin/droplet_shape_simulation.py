@@ -7,15 +7,8 @@ import matplotlib.pyplot as plt
 import os
 import sys
 import time
-# note: this enables to import from src/
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(
-    os.path.realpath(__file__))), "src"))
-try:
-    import adsa  # noqa:
-    import adsa.visualisation
-except ImportError as e:
-    print(f"Could not import adsa. Error trace: \"{e}\".")
-    sys.exit(1)
+import adsa  # noqa:
+import adsa.visualisation
 
 
 def main():
@@ -39,6 +32,7 @@ def main():
     cols = len(R0s)
     rows = len(cas)
 
+    print("Plotting figures...")
     fig = plt.figure(figsize=(3*cols, 2*rows))
 
     for i, solution in enumerate(solutions):
@@ -61,7 +55,9 @@ def main():
         # ax.axis('equal')
         #ax.set_title(f"R0 = {R0s[col]*1000.0:.1f} mm, ca = {cas[row]:.1f}°")
 
+    print("Plots generated, applying layout...")
     plt.tight_layout()
+    print("Showing plot.")
     plt.show()
 
 

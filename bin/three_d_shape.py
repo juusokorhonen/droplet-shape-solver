@@ -8,16 +8,9 @@ from mpl_toolkits.mplot3d import Axes3D
 import os
 import sys
 import time
-# note: this enables to import from src/
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(
-    os.path.realpath(__file__))), "src"))
-try:
-    import adsa  # noqa:
-    import adsa.visualisation
-    import adsa.threed
-except ImportError as e:
-    print(f"Could not import adsa. Error trace: \"{e}\".")
-    sys.exit(1)
+import adsa  # noqa:
+import adsa.visualisation
+import adsa.threed
 
 
 def main():

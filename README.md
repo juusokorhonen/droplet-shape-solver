@@ -4,26 +4,67 @@ Simple Young-Laplace equation solver for small droplets
 
 ## Installation
 
-### Pyenv + Pipenv
+If you just want to install the latest verions, run the following pip install command:
 
-- Install [Pyenv](https://github.com/pyenv/pyenv#installation).
+  pip install https://github.com/juusokorhonen/droplet-shape-solver/
 
-- Install [Pipenv](https://pipenv.pypa.io/en/latest/install/#installing-pipenv).
+## Developer installation
 
-- Set python version:
+If you want to develop this package, then you can install it locally in editable mode.
 
-  \$ pyenv local miniconda3-latest
+### MacOS and Pyenv
 
-- Install environment
+You can use anything over Python 3.7.4. I recommend either "miniconda3-latest" or one of the later CPython builds, such as 3.10.2.
 
-  \$ pipenv install
+#### Miniconda3
+
+  pyenv install minicoda3-latest
+  pyenv local miniconda3-latest
+
+#### CPython 3.10.2
+
+  pyenv install 3.10.2
+  pyenv local 3.10.2
+
+#### Upgrade essential packages and create virtual environment
+
+Regardless of the Python version, you should run these commands.
+
+  python -m pip install --upgrade pip setuptools wheel virtualenv
+  python -m virtualenv venv
+  source venv/bin/activate
+  python -m pip install -r requirements.txt -r requirements-dev.txt -r requirements-extras.txt
+
+#### Install adsa in editable mode
+
+  python -m pip install -e .
+
+### Windows and MinGW
+
+Make sure you have a proper Python installed with the `py` wrapper. Here, I assume version 3.7 of Python, but you can use a later one as well.
+
+Run these commands in the root folder of the project (ie. the folder wher this README.md file is).
+
+  py -3.7 -m pip install --upgrade pip setuptools wheel virtualenv
+  py -3.7 -m virtualenv venv
+  source venv/Scripts/activate
+  python -m pip install -r requirements.txt -r requirements-dev.txt -r requirements-extras.txt
+
+#### Install adsa in editable mode
+
+    python -m pip install -e .
+
 
 ## Run examples
 
-    $ pipenv run examples/droplet_shape_simulation.py
-    $ pipenv run examples/three_d_shape.py
+    droplet_shape_simulation.py
+    three_d_shape.py
+
+## Run cli
+
+    adsa-cli -h
+    adsa-cli demo
 
 ## Run Jupyter notebook
 
-    $ cd examples
-    $ pipenv run jupyter notebook
+    $ jupyter notebook
