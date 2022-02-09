@@ -2,22 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import os
-import sys
 import time
-# note: this enables to import from src/
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(
-    os.path.realpath(__file__))), "src"))
-try:
-    import adsa  # noqa:
-    import adsa.visualisation
-    import adsa.threed
-except ImportError as e:
-    print(f"Could not import adsa. Error trace: \"{e}\".")
-    sys.exit(1)
+import adsa
+import adsa.visualisation
 
 
 def main():
@@ -40,25 +28,29 @@ def main():
     cols = len(R0s)
     rows = len(cas)
 
+    print("Plotting figures...")
     fig = plt.figure(figsize=(3*cols, 2*rows))
 
     for i, solution in enumerate(solutions):
         col = int(i % cols)
         row = int((i - col)/cols)
 
-        ax = fig.add_subplot(rows, cols, i + 1, projection='3d')
+        ax = fig.add_subplot(rows, cols, i+1)
 
         # Extracte droplet shape from the solution
-        phi = solution.t
+        phi = solution.t   # noqa: F841
         (X, Z) = solution.y
 
         # Re-attach dimensions to the data
         x = R0s[col] * X
         z = R0s[col] * Z
 
-        adsa.visualisation.plot_drop_3d(x, z, ax=ax, style=2)
+        adsa.visualisation.plot_drop(
+            x, z, cas[row], ax=ax, style=2)
 
+    print("Plots generated, applying layout...")
     plt.tight_layout()
+    print("Showing plot.")
     plt.show()
 
 

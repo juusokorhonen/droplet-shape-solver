@@ -1,9 +1,12 @@
-#!/usr/bin/env python3
-# -*- coding: utf8
+# -*- coding: utf-8 -*-
+"""Visualization tools for water droplets.
+
+This file provides functions for easily creating standard visualizations from
+the simulated water droplet shapes.
+"""
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from . import solver, analysis, threed
+from . import analysis, threed
 
 
 def plot_drop(x, z, ca, *, color='k', label=None, ax=None, scale=None, style=1):
@@ -66,7 +69,6 @@ def plot_drop(x, z, ca, *, color='k', label=None, ax=None, scale=None, style=1):
         ax.fill(x, z, color='k', alpha=0.8)
         ax.fill(x_reflection, z_reflection, color='k', alpha=0.7)
         ax.plot(x, z, color='k', ls='-', alpha=1.0)
-        #ax.plot(x, z_reflection, color='k', ls='-', alpha=0.5)
         ax.axhline(y=0, color='k', ls='-', alpha=1.0)
     else:
         raise RuntimeError(f"Unknown plot style \"{style}\".")
@@ -95,7 +97,7 @@ def plot_drop_3d(x, z, *, ax=None, style=1):
     ax: mpl.Axes or None
         If not None, then use the existing Axes for plottting.
     style: int
-        The style used for plotting. Currently supported values are: 1, 2 
+        The style used for plotting. Currently supported values are: 1, 2
     """
     x, y, z = threed.construct_3d_pointcloud_uvsphere(x, z)
     z = -z

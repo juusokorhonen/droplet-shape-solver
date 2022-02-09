@@ -1,24 +1,25 @@
-#!/usr/bin/env python3
-# -*- coding: utf8
-import numba
+# -*- coding: utf-8 -*-
+"""Tools for extracting values from droplet shapes.
+
+This module contains helper functions for calculating physical quantities from
+droplet shape profiles provided by the solver functions.
+"""
+from typing import Optional, Any
+
 import scipy as sp
-import scipy.integrate
-import scipy.optimize
-import numpy as np
-from .units import (Quantity, as_quantity, as_scalar,
-                    g, rho_water, rho_air, gamma_water, pi,
-                    eotvos_number, capillary_length)
+from numpy import power, exp, cbrt, pi
+from numpy.typing import NDArray
 
 
-def calculate_volume(X, Z, R0=None):
+def calculate_volume(X: NDArray[Any], Z: NDArray[Any], R0: Optional[float] = None) -> float:
     """Calculates the volume associated to the `x`, and `z` coordinates by
     assuming an axisymmetric shape.
 
     Parameters
     ----------
-    X : np.ndarray (possibly dimensionless)
+    X : NDArray (possibly dimensionless)
         X coordinates of the droplet.
-    Z : np.ndarray (possibly dimensionless)
+    Z : NDArray (possibly dimensionless)
         Y coordinates of the droplet.
     R0 : float (optional, default: None)
         Radius of curvature of the droplet at the apex. If this value is set,
@@ -31,8 +32,8 @@ def calculate_volume(X, Z, R0=None):
     Calculated volume in the same units as `x` and `z`.
     """
     if R0 is None:
-        return np.pi*sp.integrate.trapz(X**2, Z)
-    return np.pi*R0**3*sp.integrate.trapz(X**2, Z)
+        return float(pi*sp.integrate.trapz(X**2, Z))
+    return float(pi*R0**3*sp.integrate.trapz(X**2, Z))
 
 
 def estimate_volume(beta, R0, *, alpha=0.0):
@@ -66,8 +67,8 @@ def estimate_volume(beta, R0, *, alpha=0.0):
     This experimental formula is presented in Rekhviashvili and Sokurov, Turk.
     J. Phys. (2018), 42, 699-705.
     """
-    return (4.73 * np.pow(R0, 3) / (np.pow(beta, 0.941) + 1.028)
-            * np.exp(-2.513 * np.pow(beta, 0.398) * alpha))
+    return (4.73 * power(R0, 3) / (power(beta, 0.941) + 1.028)
+            * exp(-2.513 * power(beta, 0.398) * alpha))
 
 
 def estimate_radius_of_curvature(beta, volume, *, alpha):
@@ -100,5 +101,4 @@ def estimate_radius_of_curvature(beta, volume, *, alpha):
     -----
     See, estimate_volume() for description of the formula.
     """
-    return np.cbrt(volume * (np.pow(beta, 0.941) + 1.028)
-                   / (4.73*np.exp(-2.513*np.pow(beta, 0.398)*alpha)))
+    return cbrt(volume * (power(beta, 0.941) + 1.028) / (4.73*exp(-2.513*power(beta, 0.398)*alpha)))

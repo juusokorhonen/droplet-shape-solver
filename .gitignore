@@ -91,3 +91,7 @@ ENV/
 # Pipenv
 Pipfile.lock
 .pipenv_*
+
+# Project-specific
+SNAPSHOT
+
