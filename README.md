@@ -12,6 +12,11 @@ If you just want to install the latest verions, run the following pip install co
 
 If you want to develop this package, then you can install it locally in editable mode.
 
+### Using Makefile
+
+  make prepare-dev
+  make dev-install
+
 ### MacOS and Pyenv
 
 You can use anything over Python 3.7.4. I recommend either "miniconda3-latest" or one of the later CPython builds, such as 3.10.2.
@@ -68,3 +73,24 @@ Run these commands in the root folder of the project (ie. the folder wher this R
 ## Run Jupyter notebook
 
     $ jupyter notebook
+
+## Testing installation
+
+The following commands are presented in pairs, which are mutually exclusive. Ie. use either one.
+
+    make tests
+    python -m pytest
+
+    make lint
+    python -m pytest --pycodestyle
+
+    make codestyle
+    python -m flake8
+
+## Create a snapshot file
+
+    make snapshot
+
+## Create a distribution
+
+    make dist
