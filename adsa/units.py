@@ -1,5 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf8
+# -*- coding: utf-8 -*-
+"""Physical units for simulations.
+
+This file provides some helper functions and ready-prepared values that are
+needed in the simulations.
+"""
 import numpy as np
 import pint
 
@@ -19,7 +23,7 @@ pi = np.pi
 
 
 def as_quantity(x, quantity):
-    """Returns `x` as a `quantity`. 
+    """Returns `x` as a `quantity`.
 
     Parameters
     ----------
@@ -34,8 +38,7 @@ def as_quantity(x, quantity):
     """
     if isinstance(x, ureg.Quantity):
         return x.to(quantity)
-    else:
-        return Quantity(x, quantity)
+    return Quantity(x, quantity)
 
 
 def as_scalar(x):
@@ -80,10 +83,6 @@ def capillary_length(drho=rho_water, g=g, gamma=gamma_water):
     `lambda_c` : Quantity
         The capillary length of the liquid in units of meters.
     """
-    # drho = as_quantity(drho, "kg/m^3")
-    # g = as_quantity(g, "m/s^2")
-    # gamma = as_quantity(gamma, "N/m")
-
     return np.sqrt(gamma / (drho * g))
 
 
@@ -103,9 +102,6 @@ def eotvos_number(L, lambda_c):
     `eotvos_number` : Quantity
         The Eötvös number for the given parameters.
     """
-    # L = as_quantity(L, "m")
-    # lambda_c = as_quantity(lambda_c, "m")
-
     return np.power(L/lambda_c, 2)
 
 

@@ -1,18 +1,19 @@
-#!/usr/bin/env python3
-# -*- coding: utf8
+# -*- coding: utf-8 -*-
+"""Solver for axisymmetric water droplets.
+
+The core functions of the solver system are located in this file.
+"""
 import numba
 import scipy as sp
 import scipy.integrate
 import scipy.optimize
 import numpy as np
-from .units import (Quantity, as_quantity, as_scalar,
-                    g, rho_water, rho_air, gamma_water, pi,
-                    eotvos_number, capillary_length, ureg)
+from .units import Quantity, as_quantity, g, rho_water, rho_air, gamma_water
 
 
 @numba.jit(nopython=True)
 def adams_bashforth_derivative(phi, Y, beta, alpha=0.0, gamma=2.0):
-    """
+    r"""
     Calculates the derivate of the Young-Laplace equation using Adams-Bashforth formalism.
     These equations are solved in the non-dimensional form.
 
@@ -43,7 +44,7 @@ def adams_bashforth_derivative(phi, Y, beta, alpha=0.0, gamma=2.0):
         correction term to the Young-Laplace equation for highly curved
         surfaces.
 
-        .. math:: 
+        .. math::
             \Delta p = \frac{2\sigma}{r}\left(1-\frac{\delta}{r}+\ldots\right)
 
         gamma = 2 / (1+2 * `alpha`). Note: when `alpha` = 0 (ie. ignoring

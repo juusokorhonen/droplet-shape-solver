@@ -5,3 +5,4 @@ pytest>=7.0.0
 pytest-cov>=3.0.0
 pytest-pycodestyle>=2.2.0
 tox>=3.24.5
+pylint>=2.12.2

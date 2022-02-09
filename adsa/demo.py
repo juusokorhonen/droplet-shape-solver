@@ -1,14 +1,14 @@
-import logging
+# -*- coding: utf-8 -*-
+"""A simulation and visualization demonstration.
 
-import numpy as np
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
+This module runs a simple demonstration of the capabilities of the adsa
+simulations and analysis.
+"""
+import logging
 
 from .solver import simulate_droplet_shape
 from .analysis import calculate_volume
 from .visualisation import plot_drop, plot_drop_3d
-from .threed import construct_3d_pointcloud_uvsphere
 
 
 def run_demo(args):
@@ -24,6 +24,7 @@ def run_demo(args):
     x = y.y[0]
     z = y.y[1]
     vol = calculate_volume(x, z)
+    logging.info(f"Droplet volume: {vol}.")
     if args.type == '3d':
         plot_drop_3d(x, z, style=args.style)
     elif args.type == '2d':

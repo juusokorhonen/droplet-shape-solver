@@ -1,13 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf8
-import numba
-import scipy as sp
-import scipy.integrate
-import scipy.optimize
+# -*- coding: utf-8 -*-
+"""Three-dimensional analysis tools for droplet shapes.
+
+The functions here can be used to construct three-dimensional versions of the
+droplet simulation results.
+"""
 import numpy as np
-from .units import (Quantity, as_quantity, as_scalar,
-                    g, rho_water, rho_air, gamma_water, pi,
-                    eotvos_number, capillary_length, ureg)
 
 
 def construct_3d_pointcloud_uvsphere(rho, z, *, theta=None):
@@ -29,8 +26,8 @@ def construct_3d_pointcloud_uvsphere(rho, z, *, theta=None):
     if theta is None:
         theta = np.linspace(0, 2*np.pi, 32)  # 32 points around
 
-    x = np.array([r * np.cos(theta) for r in rho])
-    y = np.array([r * np.sin(theta) for r in rho])
-    z = np.array([z_ * np.ones_like(theta) for z_ in z])
+    xs = np.array([r * np.cos(theta) for r in rho])
+    ys = np.array([r * np.sin(theta) for r in rho])
+    zs = np.array([z_ * np.ones_like(theta) for z_ in z])
 
-    return x, y, z
+    return xs, ys, zs

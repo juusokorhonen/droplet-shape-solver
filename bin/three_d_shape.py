@@ -2,13 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import os
-import sys
 import time
-import adsa  # noqa:
+import adsa
 import adsa.visualisation
 import adsa.threed
 
@@ -37,12 +33,12 @@ def main():
 
     for i, solution in enumerate(solutions):
         col = int(i % cols)
-        row = int((i - col)/cols)
+        row = int((i - col)/cols)   # noqa: F841
 
         ax = fig.add_subplot(rows, cols, i + 1, projection='3d')
 
         # Extracte droplet shape from the solution
-        phi = solution.t
+        phi = solution.t   # noqa: F841
         (X, Z) = solution.y
 
         # Re-attach dimensions to the data

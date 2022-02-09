@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""Command line interface for interacting with the module.
+
+The command line interface can be used to run simple simulations and analyses
+using the module.
+"""
 import sys
 import argparse
 import logging
@@ -17,9 +23,8 @@ def run_tests(args):
         logging.error("Cannot run tests, pytest is not installed.")
         return -1
     logging.info("Running tests.")
-    exit_code = pytest.main(["-x", Path(__file__).parent.resolve() / "../tests"])
+    exit_code = pytest.main(["-x", str(Path(__file__).parent.resolve() / "../tests")])
     return exit_code
-
 
 
 def cli():
@@ -37,7 +42,7 @@ def cli():
     def lowercase(value: str):
         return value.lower()
 
-    def mm(value: float):
+    def mm(value: str) -> float:
         return float(value) * 1e-3
 
     parser.add_argument('-log', "--loglevel",
@@ -51,10 +56,9 @@ def cli():
         'nothing': do_nothing,
         'demo': run_demo,
     }
-    #parser.add_argument('command', type=str, choices=commands.keys(), help="Command to run")
     cmdparsers = parser.add_subparsers(dest="command", required=True)
-    nothing_parser = cmdparsers.add_parser('nothing')
-    tests_parser = cmdparsers.add_parser('tests')
+    nothing_parser = cmdparsers.add_parser('nothing')   # noqa: F841
+    tests_parser = cmdparsers.add_parser('tests')   # noqa: F841
     demo_parser = cmdparsers.add_parser('demo')
     demo_parser.add_argument("R0", default=10.0e-3, type=mm, help="Radius of curvature at top, in mm", nargs='?')
     demo_parser.add_argument("ca", default=150.0, type=float, help="Contact angle at surface, in deg.", nargs='?')

@@ -12,8 +12,6 @@ ifeq ($(PYTHON_VERSION_OK),0)
   $(error "Need python $(PYTHON_VERSION) >= $(PYTHON_VERSION_MIN)")
 endif
 
-PYV=$(shell python3 -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)");
-PY=python -m py_compile
 VENV_NAME?=venv
 VENV_ACTIVATE=. $(VENV_NAME)/bin/activate
 VPYTHON=${VENV_NAME}/bin/python3
@@ -25,11 +23,18 @@ help:
 	@echo "make tests"
 	@echo "    run tests"
 	@echo "make lint"
-	@echo "    run pylint and mypy"
-	@echo "make build"
-	@echo "    build the installation package"
+	@echo "    run lint with pylint"
+	@echo "make typechecks"
+	@echo "    run type checking with mypy"
+	@echo "make codestyle"
+	@echo "    check code style with flake8"
+	@echo "make dev-install"
+	@echo "    install the current folder in develoment mode"
 	@echo "make snapshot"
 	@echo "    build a snapshot"
+	@echo "make dist"
+	@echo "    build a distribution package"
+
 
 .PHONY: clean
 clean:
@@ -56,7 +61,7 @@ $(VENV_NAME)/bin/activate: setup.py
 	${VPYTHON} -m pip install -r requirements-extras.txt
 
 dev-install: venv
-	${VPYTHON} -m pip install -e .
+	${VPYTHON} -m pip install -e .[tests,extras]
 
 .PHONY: snapshot-version
 snapshot-version: adsa.egg-info/PKG-INFO
@@ -80,10 +85,20 @@ dist: venv
 tests:
 	$(VPYTHON) -m pytest
 
+.PHONE: checks
+checks:
+	@+make lint
+	@+make typechecks
+	@+make codestyle
+
 .PHONY: lint
-lint: venv
-	$(VPYTHON) -m pytest --pycodestyle
+lint:
+	$(VPYTHON) -m pylint adsa bin
+
+.PHONY: typechecks
+typechecks:
+	$(VPYTHON) -m mypy adsa bin
 
 .PHONY: codestyle
-codestyle: venv
-	$(VPYTHON) -m flake8
+codestyle:
+	$(VPYTHON) -m flake8 adsa bin

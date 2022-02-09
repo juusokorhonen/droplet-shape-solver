@@ -2,19 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-import os
-import sys
 import time
-import adsa  # noqa:
+import adsa
 import adsa.visualisation
 
 
 def main():
     R0s = np.linspace(1.0e-3, 10e-3, 10)
     cas = np.linspace(0, 180, 6)[1:]
-    lambda_c = adsa.units.capillary_length()
 
     solutions = []
     runtimes = []
@@ -42,7 +38,7 @@ def main():
         ax = fig.add_subplot(rows, cols, i+1)
 
         # Extracte droplet shape from the solution
-        phi = solution.t
+        phi = solution.t   # noqa: F841
         (X, Z) = solution.y
 
         # Re-attach dimensions to the data
@@ -51,9 +47,6 @@ def main():
 
         adsa.visualisation.plot_drop(
             x, z, cas[row], ax=ax, style=2)
-
-        # ax.axis('equal')
-        #ax.set_title(f"R0 = {R0s[col]*1000.0:.1f} mm, ca = {cas[row]:.1f}°")
 
     print("Plots generated, applying layout...")
     plt.tight_layout()
