@@ -19,7 +19,7 @@ rho_air = Quantity(1.1839, "kg/m^3")
 gamma_water = Quantity(72.8e-3, 'N/m')
 rho = Quantity(1000.0, 'kg/m^3')
 g = Quantity(9.81, 'm/s^2')
-pi = np.pi
+pi = 3.14159285258
 
 
 def as_quantity(x, quantity):
