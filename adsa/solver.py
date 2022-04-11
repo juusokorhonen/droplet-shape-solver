@@ -90,10 +90,10 @@ def adams_bashforth_derivative(phi, Y, beta, alpha=0.0, gamma=2.0):
 
 
 def simulate_droplet_shape(R0, ca_target=180.0, 
-        g=g, 
-        gamma_water=gamma_water, 
-        rho_water=rho_water,
-        rho_air=rho_air):
+                           g=g, 
+                           gamma_water=gamma_water, 
+                           rho_water=rho_water,
+                           rho_air=rho_air):
     """Simulates droplet shape using Young-Laplace differential equations in the
     axisymmetric case.
 
