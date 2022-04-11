@@ -5,6 +5,11 @@ This module runs a simple demonstration of the capabilities of the adsa
 simulations and analysis.
 """
 import logging
+from lazy_import import lazy_callable
+#simulate_droplet_shape = lazy_callable('.solver.simulate_droplet_shape')
+#calculate_volume = lazy_callable('.analysis.calculate_volume')
+#plot_drop = lazy_callable('.visualisation.plot_drop')
+#plot_drop_3d = lazy_callable('.visualisation.plot_drop_3d')
 
 from .solver import simulate_droplet_shape
 from .analysis import calculate_volume

@@ -94,4 +94,4 @@ Pipfile.lock
 
 # Project-specific
 SNAPSHOT
-
+temp/*

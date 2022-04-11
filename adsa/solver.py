@@ -6,7 +6,6 @@ The core functions of the solver system are located in this file.
 import numba
 import scipy as sp
 import scipy.integrate
-import scipy.optimize
 import numpy as np
 from .units import Quantity, as_quantity, g, rho_water, rho_air, gamma_water
 
@@ -90,7 +89,11 @@ def adams_bashforth_derivative(phi, Y, beta, alpha=0.0, gamma=2.0):
     return np.array([dX_dphi, dZ_dphi])
 
 
-def simulate_droplet_shape(R0, ca_target=180.0):
+def simulate_droplet_shape(R0, ca_target=180.0, 
+        g=g, 
+        gamma_water=gamma_water, 
+        rho_water=rho_water,
+        rho_air=rho_air):
     """Simulates droplet shape using Young-Laplace differential equations in the
     axisymmetric case.
 
@@ -106,22 +109,26 @@ def simulate_droplet_shape(R0, ca_target=180.0):
     droplet_shape : np.ndarray
         Right side of droplet shape as ndarray.
     """
-    R0 = as_quantity(R0, 'm')
-    ca_target = as_quantity(ca_target, 'degrees')
+    if isinstance(R0, Quantity):
+        R0 = R0.to('m')
+    if isinstance(ca_target, Quantity):
+        ca_target = ca_target.to('degrees')
     ca_target = np.deg2rad(ca_target)
 
+    # Constants
+    g = g.to('m/s^2')
     # Set up parameters for model
-    sigma = gamma_water.magnitude
+    sigma = gamma_water.to("N/m")   # in N/m
     # Tolman length, 0 = ignore curvature dependence of surface tension
-    delta = Quantity(0, 'm')
-    alpha = (delta / R0).magnitude
-    drho = (rho_water - rho_air).magnitude
-    beta = (drho * g * R0 ** 2 / sigma).magnitude
-    gamma = 2/(1+2*alpha)
+    delta = 0.0   # in meters
+    alpha = (delta / R0)   # in m/m --> unitless
+    drho = (rho_water - rho_air).to("kg/m^3")   # in kg/m^3
+    beta = (drho * g * R0 ** 2 / sigma)   # in m
+    gamma = 2/(1+2*alpha)   # in unitless
 
     solution_right = sp.integrate.solve_ivp(
         adams_bashforth_derivative,
-        (0, ca_target.magnitude), (0, 0),
+        (0, ca_target), (0, 0),
         args=(beta, alpha, gamma), method='BDF')
 
     return solution_right

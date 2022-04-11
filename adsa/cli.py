@@ -8,8 +8,9 @@ import sys
 import argparse
 import logging
 from pathlib import Path
-
-from .demo import run_demo
+from lazy_import import lazy_callable
+run_demo = lazy_callable('adsa.demo.run_demo')
+#from .demo import run_demo
 
 
 def do_nothing(args):
@@ -19,6 +20,7 @@ def do_nothing(args):
 def run_tests(args):
     try:
         import pytest
+        from . import units
     except ImportError:
         logging.error("Cannot run tests, pytest is not installed.")
         return -1
