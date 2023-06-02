@@ -116,3 +116,7 @@ def cli():
     logging.basicConfig(level=loglevels[args.loglevel])
 
     sys.exit(commands[args.command](args))
+
+
+if __name__ == "__main__":
+    cli()

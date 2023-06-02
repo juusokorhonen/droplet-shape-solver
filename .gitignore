@@ -96,3 +96,4 @@ Pipfile.lock
 SNAPSHOT
 temp/*
 output/*
+src/adsa/VERSION.py

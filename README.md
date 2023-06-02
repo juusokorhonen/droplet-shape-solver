@@ -4,6 +4,8 @@ Simple Young-Laplace equation solver for small droplets
 
 ## Installation
 
+This package is currently targeting Python version 3.10 and above.
+
 If you just want to install the latest verions, run the following pip install command:
 
   pip install https://github.com/juusokorhonen/droplet-shape-solver/
@@ -17,32 +19,30 @@ If you want to develop this package, then you can install it locally in editable
   make prepare-dev
   make dev-install
 
-### MacOS and Pyenv
+#### CPython 3.10.11
 
-You can use anything over Python 3.7.4. I recommend either "miniconda3-latest" or one of the later CPython builds, such as 3.10.2.
-
-#### Miniconda3
-
-  pyenv install minicoda3-latest
-  pyenv local miniconda3-latest
-
-#### CPython 3.10.2
-
-  pyenv install 3.10.2
-  pyenv local 3.10.2
+  pyenv install 3.10.11
+  pyenv local 3.10.11
 
 #### Upgrade essential packages and create virtual environment
 
 Regardless of the Python version, you should run these commands.
 
-  python -m pip install --upgrade pip setuptools wheel virtualenv py-make
+  cd /path/to/adsa
+
+  python -V
+  >  Python 3.10.11
+
+  python -m pip install --upgrade pip setuptools setuptools_scm virtualenv py-make build
   python -m virtualenv venv
-  source venv/bin/activate
-  python -m pip install -r requirements.txt -r requirements-dev.txt -r requirements-extras.txt
+  source venv/bin/activate   # Linux, MacOS
+  .\venv\Source\activate
+  python -m pip install -r requirements.txt -r requirements-tests.txt -r requirements-extras.txt
 
 #### Install adsa in editable mode
 
-  python -m pip install -e .
+  python -m pip install -e /path/to/adsa
+
 
 ### Windows and MinGW
 
@@ -59,11 +59,10 @@ Run these commands in the root folder of the project (ie. the folder wher this R
 
     python -m pip install -e .
 
-
 ## Run examples
 
-    droplet_shape_simulation.py
-    three_d_shape.py
+    python -m adsa.examples.droplet_shape_simulation
+    python -m adsa.examples.three_d_shape.py
 
 ## Run cli
 

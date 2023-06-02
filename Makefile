@@ -3,7 +3,7 @@ ifeq (, $PYTHON)
   $(error "PYTHON=$(PYTHON) not found in $(PATH)")
 endif
 
-PYTHON_VERSION_MIN=3.7
+PYTHON_VERSION_MIN=3.10
 PYTHON_VERSION=$(shell $(PYTHON) -c 'import sys; print("%d.%d"% sys.version_info[0:2])' )
 PYTHON_VERSION_OK=$(shell $(PYTHON) -c 'import sys;\
   print(int(float("%d.%d"% sys.version_info[0:2]) >= $(PYTHON_VERSION_MIN)))' )
@@ -41,6 +41,7 @@ clean:
 	test -d dist && rm -rf dist/ || true
 	test -d build && rm -rf build/ || true
 	test -d adsa.egg-info && rm -rf adsa.egg-info || true
+	test -d src/adsa.egg-info && rm -rf src/adsa.egg-info || true
 	find . -type d -name "__pycache__" -mindepth 1 -exec rm -rf {} \; -prune
 	find . -type f -name "*.pyc" -exec rm {} \;
 
@@ -50,22 +51,22 @@ clean-all:
 	test -d venv && rm -rf venv/ || true
 
 prepare-dev: venv
-	${PYTHON} -m pip install --upgrade pip setuptools wheel virtualenv py-make
+	${PYTHON} -m pip install --upgrade pip setuptools setuptools_scm virtualenv py-make build
 	@+make venv
 
 venv: $(VENV_NAME)/bin/activate
 $(VENV_NAME)/bin/activate: setup.py
 	test -d $(VENV_NAME) || virtualenv -p python3 $(VENV_NAME)
 	${VPYTHON} -m pip install -r requirements.txt
-	${VPYTHON} -m pip install -r requirements-dev.txt
 	${VPYTHON} -m pip install -r requirements-extras.txt
+	${VPYTHON} -m pip install -r requirements-tests.txt
 
 dev-install: venv
-	${VPYTHON} -m pip install -e .[tests,extras]
+	${VPYTHON} -m pip install --editable '.[tests,extras]'
 
 .PHONY: snapshot-version
-snapshot-version: adsa.egg-info/PKG-INFO
-	grep "^Version:" adsa.egg-info/PKG-INFO | sed 's/^Version: //' > SNAPSHOT
+snapshot-version: src/adsa.egg-info/PKG-INFO
+	grep "^Version:" src/adsa.egg-info/PKG-INFO | sed 's/^Version: //' > SNAPSHOT
 
 .PHONY: snapshot
 snapshot: venv
@@ -93,12 +94,12 @@ checks:
 
 .PHONY: lint
 lint:
-	$(VPYTHON) -m pylint adsa bin
+	$(VPYTHON) -m pylint src
 
 .PHONY: typechecks
 typechecks:
-	$(VPYTHON) -m mypy adsa bin
+	$(VPYTHON) -m mypy src
 
 .PHONY: codestyle
 codestyle:
-	$(VPYTHON) -m flake8 adsa bin
+	$(VPYTHON) -m flake8 src
