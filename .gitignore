@@ -94,13 +94,6 @@ Pipfile.lock
 
 # Project-specific
 SNAPSHOT
-<<<<<<< HEAD
 temp/*
 output/*
 src/adsa/VERSION.py
-||||||| a74c939
-
-=======
-temp/*
-output/*
->>>>>>> origin/main
