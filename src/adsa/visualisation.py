@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from . import analysis, threed
 
 
-def plot_drop(x, z, ca, *, color='k', label=None, ax=None, scale=None, style=1):
+def plot_drop(x, z, ca, *, color='k', label=None, ax=None, scale=None, style=1, show=True):
     """Plots the given drop shape.
 
     Parameters
@@ -36,16 +36,20 @@ def plot_drop(x, z, ca, *, color='k', label=None, ax=None, scale=None, style=1):
         The style to use. Current values are:
         1: Line plot with annotations
         2: Pseudo-camera view
+    show: bool
+        Show the chart after plotting.
+
+    Returns
+    -------
+    The matplotlib figure instance.
     """
     x = np.hstack((-x[::-1], x[1:]))
     z = np.hstack((-z[::-1], -z[1:]))
     z = z - z.min()
 
-    show_after_plot = False
     if ax is None:
         fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111)
-        show_after_plot = True
 
     if style == 1:
         ax.plot(x, z, ls='-', color=color, mec=color, mfc='w',
@@ -81,11 +85,13 @@ def plot_drop(x, z, ca, *, color='k', label=None, ax=None, scale=None, style=1):
 
     ax.axis('equal')
 
-    if show_after_plot:
+    if show:
         plt.show()
 
+    return fig
 
-def plot_drop_3d(x, z, *, ax=None, style=1):
+
+def plot_drop_3d(x, z, *, ax=None, style=1, show=True):
     """Creates a 3D visulisation of the droplet.
 
     Parameters
@@ -98,16 +104,20 @@ def plot_drop_3d(x, z, *, ax=None, style=1):
         If not None, then use the existing Axes for plottting.
     style: int
         The style used for plotting. Currently supported values are: 1, 2
+    show: bool
+        Show the chart after plotting.
+
+    Returns
+    -------
+    The matplotlib figure instance.
     """
     x, y, z = threed.construct_3d_pointcloud_uvsphere(x, z)
     z = -z
     z = z - z.min()
 
-    show_after_plot = False
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
-        show_after_plot = True
 
     if style == 1:
         ax.view_init(elev=5, azim=0)
@@ -139,5 +149,7 @@ def plot_drop_3d(x, z, *, ax=None, style=1):
     else:
         raise RuntimeError(f"Unknown plot style \"{style}\".")
 
-    if show_after_plot:
+    if show:
         plt.show()
+
+    return fig

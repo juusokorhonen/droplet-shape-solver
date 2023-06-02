@@ -94,4 +94,6 @@ Pipfile.lock
 
 # Project-specific
 SNAPSHOT
-
+temp/*
+output/*
+src/adsa/VERSION.py
