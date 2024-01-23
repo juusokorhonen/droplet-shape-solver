@@ -41,8 +41,6 @@ Sometimes poetry might not read .python-version file but try to use the wrong ve
     poetry env use ~/.pyenv/versions/3.11.7/bin/python
 
 
-
-
 ## Developer installation
 
 If you want to develop this package, then you can install it locally in editable mode.
