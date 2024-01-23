@@ -6,7 +6,9 @@ the simulated water droplet shapes.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from . import analysis, threed
+
+from adsa import analysis
+from adsa import threed
 
 
 def plot_drop(x, z, ca, *, color='k', label=None, ax=None, scale=None, style=1, show=True):
@@ -61,14 +63,14 @@ def plot_drop(x, z, ca, *, color='k', label=None, ax=None, scale=None, style=1, 
 
         volume = analysis.calculate_volume(x, z)
         ax.text(0.5, 0.5, u"Contact angle: {:.4}\nVolume: {:.4} uL".format(
-                ca, volume*1e9),
+                ca, volume * 1e9),
                 horizontalalignment='center',
                 verticalalignment='center',
                 transform=ax.transAxes)
 
     elif style == 2:
         z_reflection = -z * 0.25
-        x_reflection = x + 0.25*z*np.sign(x)
+        x_reflection = x + 0.25 * z * np.sign(x)
 
         ax.fill(x, z, color='k', alpha=0.8)
         ax.fill(x_reflection, z_reflection, color='k', alpha=0.7)

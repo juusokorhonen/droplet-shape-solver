@@ -13,6 +13,10 @@ classifiers = [
     "Operating System :: OS Independent",
     "Development Status :: 3 - Alpha",
 ]
+packages = [{ include = "adsa", from = "src" }]
+
+[tool.poetry.scripts]
+adsa-cli = "adsa.cli:cli"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -20,6 +24,7 @@ scipy = "^1.12.0"
 llvmlite = "^0.41.1"
 numba = "^0.58.1"
 numpy = "^1.26.3"
+lazy-loader = "^0.3"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"
@@ -29,19 +34,12 @@ pytest = "^7.4.4"
 pytest-cov = "^4.1.0"
 pytest-pycodestyle = "^2.3.1"
 tox = "^4.12.1"
+python-semantic-release = "^8.7.0"
 
-[tool.poerty.group.notebook.dependencies]
-matplotlib = ">=3.7"
-matplotlib-inline = ">=0.1"
-pandas = ">=2.0"
-Pillow = ">=9.5"
-seaborn = ">=0.12"
-ipython = ">=8.13"
-ipykernel = ">=6.23"
-jupyter = ">=1.0"
-nbconvert = ">=7.4"
-nbformat = ">=5.9"
-widgetsnbextension = ">=4.0"
+[tool.poetry.group.extras.dependencies]
+matplotlib = "^3.8.2"
+seaborn = "^0.13.1"
+jupyter = "^1.0.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -56,3 +54,44 @@ branch = "main"
 upload_to_pypi = false
 upload_to_release = true
 build_command = "poetry build"
+
+[tool.pytest.ini_options]
+addopts = "--cov=adsa --pycodestyle"
+testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "2.7"
+mypy_path = "adsa"
+check_untyped_defs = true
+disallow_any_generics = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+no_implicit_reexport = true
+
+[tool.black]
+line-length = 122
+
+[tool.pycodestyle]
+max-line-length = 122
+
+[tool.flake8]
+max-line-length = 122
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "build/*",
+    "dist",
+    "dist/*",
+    "*.egg-info",
+    "venv",
+    "venv/*",
+]
+max-complexity = 10
+extend-ignore = ["E203"]

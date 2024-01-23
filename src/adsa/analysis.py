@@ -4,11 +4,11 @@ This module contains helper functions for calculating physical quantities from
 droplet shape profiles provided by the solver functions.
 """
 from typing import Optional, Any
+import math
 
 import scipy as sp
 import numpy as np
 import numpy.typing as npt
-import math
 
 
 def calculate_volume(
@@ -112,4 +112,4 @@ def estimate_radius_of_curvature(
     -----
     See, estimate_volume() for description of the formula.
     """
-    return np.cbrt(volume * (math.pow(beta, 0.941) + 1.028) / (4.73*math.exp(-2.513*math.pow(beta, 0.398)*alpha)))
+    return np.cbrt(volume * (math.pow(beta, 0.941) + 1.028) / (4.73 * math.exp(-2.513 * math.pow(beta, 0.398) * alpha)))

@@ -4,14 +4,16 @@
 This module runs a simple demonstration of the capabilities of the adsa
 simulations and analysis.
 """
+
 import logging
 from pathlib import Path
 import csv
 
-from .solver import simulate_droplet_shape
-from .analysis import calculate_volume
-from .visualisation import plot_drop, plot_drop_3d
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
+
+from adsa.solver import simulate_droplet_shape
+from adsa.analysis import calculate_volume
+from adsa.visualisation import plot_drop, plot_drop_3d
 
 
 def run_demo(args):
@@ -22,17 +24,15 @@ def run_demo(args):
     ca = args.ca
     logging.info(f"R0={R0}, ca={ca}")
 
-    y = simulate_droplet_shape(R0, ca)
-    logging.debug(f"y.y={y.y}, y.y.shape={y.y.shape}")
-    x = y.y[0]
-    z = y.y[1]
-    vol = calculate_volume(x, z)
+    alphas, xs, zs = simulate_droplet_shape(R0, ca)
+    vol = calculate_volume(xs, zs)
+
     logging.info(f"Droplet volume: {vol}.")
     fig = None
     if args.type == '3d':
-        fig = plot_drop_3d(x, z, style=args.style, show=(not args.noshow))
+        fig = plot_drop_3d(xs, zs, style=args.style, show=(not args.noshow))
     elif args.type == '2d':
-        fig = plot_drop(x, z, ca=ca, style=args.style, show=(not args.noshow))
+        fig = plot_drop(xs, zs, ca=ca, style=args.style, show=(not args.noshow))
 
     if fig is not None and args.save:
         filepath = Path(args.save)
@@ -41,6 +41,7 @@ def run_demo(args):
         else:
             logging.info(f"Saving plot output to {filepath}")
             fig.savefig(filepath)
+
 
 def run_sweep(args):
     logging.info("Running sweep.")
@@ -53,16 +54,15 @@ def run_sweep(args):
 
         for R0 in args.R0:
             for ca in args.ca:
-                y = simulate_droplet_shape(R0, ca)
-                x = y.y[0]
-                z = y.y[1]
-                vol = calculate_volume(x, z)
-                logging.info(f"CA={ca} deg; R0={R0*1000} mm; Vol={vol*1e6} µL")
-                writer.writerow({'R0': R0*1000, 'CA': ca, 'Volume': vol*1e6})
+                alphas, xs, zs = simulate_droplet_shape(R0, ca)
+                vol = calculate_volume(xs, zs)
 
-                fig = plot_drop(x, z, ca=ca, style=args.style, show=False)
+                logging.info(f"CA={ca} deg; R0={R0*1000} mm; Vol={vol*1e6} µL")
+                writer.writerow({'R0': R0 * 1000, 'CA': ca, 'Volume': vol * 1e6})
+
+                fig = plot_drop(xs, zs, ca=ca, style=args.style, show=False)
                 for ext in args.filetypes:
-                    filepath = Path(args.filename.format(ca=ca, R0=1000*R0, ext=ext))
+                    filepath = Path(args.filename.format(ca=ca, R0=1000 * R0, ext=ext))
                     if (filepath.exists()):
                         logging.error(f"Will not overwrite existing file: {filepath}")
                     else:
