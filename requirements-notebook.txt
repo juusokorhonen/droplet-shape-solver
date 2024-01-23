@@ -3,7 +3,6 @@ matplotlib-inline>=0.1.6
 pandas>=2.0.2
 Pillow>=9.5.0
 seaborn>=0.12.2
-ipykernel>=6.22.0
 ipython>=8.13.2
 ipykernel>=6.23.1
 jupyter>=1.0.0
