@@ -10,6 +10,39 @@ If you just want to install the latest verions, run the following pip install co
 
     pip install git+https://github.com/juusokorhonen/droplet-shape-solver/@main
 
+## Poetry installation
+
+These instructions are for MacOS:
+
+Install pipx (https://pipx.pypa.io/latest/installation/):
+
+    brew install pipx
+    pipx ensurepath
+
+Optionally add pipx completions to your shell. To get instruction, run:
+
+    pipx completions
+
+Install Poetry (https://python-poetry.org/docs/):
+
+    pipx install poetry
+
+### Possible problems
+
+Sometimes you will get an error when pip tries to install **llvmlite**: "RuntimeError: Could not find a `llvm-config` binary. There are a number of reasons this could occur, please see: https://llvmlite.readthedocs.io/en/latest/admin-guide/install.html#using-pip for help."
+
+Install LLVM 14:
+
+    brew install llvm@14
+    export LLVM_CONFIG=/opt/homebrew/opt/llvm@14/bin/llvm-config
+
+Sometimes poetry might not read .python-version file but try to use the wrong version instead. In this case run:
+
+    poetry env use ~/.pyenv/versions/3.11.7/bin/python
+
+
+
+
 ## Developer installation
 
 If you want to develop this package, then you can install it locally in editable mode.

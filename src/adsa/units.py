@@ -5,7 +5,9 @@ This file provides some helper functions and ready-prepared values that are
 needed in the simulations.
 """
 from typing import Union
+
 import numpy as np
+
 
 class Quantity():
     def __init__(self, value: Union[int, float], unit: str = ""):
@@ -155,7 +157,7 @@ def eotvos_number(L, lambda_c):
         L = L.to('m')
     if isinstance(lambda_c, Quantity):
         lambda_c = lambda_c.to('m')
-    return np.power(L/lambda_c, 2)
+    return np.power(L / lambda_c, 2)
 
 
 # Alias for Eötvös number

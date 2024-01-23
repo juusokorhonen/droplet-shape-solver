@@ -1,85 +1,63 @@
-[build-system]
-requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "adsa"
-authors = [
-  { name = "Juuso Korhonen" },
-]
+version = "0.0.0"
 description = "A Young-Laplace equation solver for axisymmetric droplets."
+authors = ["Juuso Korhonen <juusokorhonen@users.noreply.github.com>"]
+license = "MIT License"
 readme = "README.md"
-requires-python = ">=3.10"
-license = { text = "MIT License" }
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3 :: Only",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Development Status :: 3 - Alpha",
 ]
-dependencies = [
-    "lazy_import>=0.2",
-    "scipy>=1.10",
-    "numpy>=1.24",
-    "Pint>=0.22",
-    "numba>=0.57",
-]
-dynamic = ["version"]
+packages = [{ include = "adsa", from = "src" }]
 
-[project.optional-dependencies]
-tests = [
-  "setuptools-scm>=7.1",
-  "flake8>=6.0",
-  "mypy>=1.3",
-  "pycodestyle>=2.10",
-  "pytest>=7.3",
-  "pytest-cov>=4.1",
-  "pytest-pycodestyle>=2.3",
-  "tox>=4.5",
-  "pylint>=2.17",
-]
-extras = [
-  "matplotlib>=3.7",
-  "matplotlib-inline>=0.1",
-  "pandas>=2.0",
-  "Pillow>=9.5",
-  "seaborn>=0.12",
-  "ipykernel>=6.22",
-  "ipython>=8.13",
-  "ipykernel>=6.23",
-  "jupyter>=1.0",
-  "nbconvert>=7.4",
-  "nbformat>=5.9",
-  "widgetsnbextension>=4.0",
-]
-
-[project.scripts]
+[tool.poetry.scripts]
 adsa-cli = "adsa.cli:cli"
 
-[tool.setuptools]
-zip-safe = false
-license-files = [
-  "LICENSE"
+[tool.poetry.dependencies]
+python = "^3.11"
+scipy = "^1.12.0"
+llvmlite = "^0.41.1"
+numba = "^0.58.1"
+numpy = "^1.26.3"
+lazy-loader = "^0.3"
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.0.0"
+mypy = "^1.8.0"
+pycodestyle = "^2.11.1"
+pytest = "^7.4.4"
+pytest-cov = "^4.1.0"
+pytest-pycodestyle = "^2.3.1"
+tox = "^4.12.1"
+python-semantic-release = "^8.7.0"
+
+[tool.poetry.group.extras.dependencies]
+matplotlib = "^3.8.2"
+seaborn = "^0.13.1"
+jupyter = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.semantic_release]
+version_variable = [
+    "src/adsa/__init__.py:__version__",
+    "pyproject.toml:version",
 ]
-
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["adsa"]
-namespaces = false
-
-[tool.setuptools.package-data]
-adsa = ["py.typed"]
-
-[tool.setuptools_scm]
-write_to = "src/adsa/VERSION.py"
+branch = "main"
+upload_to_pypi = false
+upload_to_release = true
+build_command = "poetry build"
 
 [tool.pytest.ini_options]
 addopts = "--cov=adsa --pycodestyle"
-testpaths = [
-  "tests",
-]
+testpaths = ["tests"]
 
 [tool.mypy]
 python_version = "2.7"
@@ -116,6 +94,4 @@ exclude = [
     "venv/*",
 ]
 max-complexity = 10
-extend-ignore = [
-  "E203",
-]
+extend-ignore = ["E203"]

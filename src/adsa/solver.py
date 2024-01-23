@@ -3,16 +3,15 @@
 
 The core functions of the solver system are located in this file.
 """
-from typing import Any, Optional, Union
+from typing import Any, Optional
+
 import numba
 import scipy as sp
-import scipy.integrate
-import scipy.optimize
 import numpy as np
 import numpy.typing as npt
 
-from adsa.analysis import calculate_volume, estimate_radius_of_curvature
-from .units import Quantity, as_quantity, g, rho_water, rho_air, gamma_water
+from adsa.analysis import calculate_volume
+from adsa.units import g, rho_water, rho_air, gamma_water
 
 
 @numba.jit(nopython=True)
@@ -90,7 +89,7 @@ def adams_bashforth_derivative(
     k1 = gamma + beta * Z
     sinphi = np.sin(phi)
     cosphi = np.cos(phi)
-    K = X*(1 - alpha*k1) / (k1*X - (1 - alpha*k1)*sinphi) \
+    K = X * (1 - alpha * k1) / (k1 * X - (1 - alpha * k1) * sinphi) \
         if X != 0 and phi != 0 else 1
 
     dX_dphi = cosphi * K
@@ -109,7 +108,7 @@ def simulate_droplet_shape(
         gamma_liquid: float = gamma_water.to("N/m"),
         rho_liquid: float = rho_water.to("kg/m^3"),
         rho_vapour: float = rho_air.to("kg/m^3")
-        ) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
+) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
     """Simulates droplet shape using Young-Laplace differential equations in the
     axisymmetric case.
 
@@ -148,14 +147,14 @@ def simulate_droplet_shape(
         t_eval=t_eval,
         args=(beta, alpha, gamma), method='BDF')
 
-    return (result.t, result.y[0], result.y[1]) if dimensionless_result else (result.t, R0*result.y[0], R0*result.y[1])
+    return result.t, result.y[0], result.y[1]
 
 
 def solve_droplet_shape_for_volume(
         vol_target: float,
         ca_target: float = 180.0,
         R0_guess: Optional[float] = None
-        ) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
+) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
     """Simulates droplet shape and optimizes the result for the given `vol_target`.
     Note that the shape cannot be calculated directly, but must be numerically
     searched, resulting in much longer run times than `simulate_droplet_shape`.
@@ -180,7 +179,7 @@ def solve_droplet_shape_for_volume(
         R0 = x[0]
         (_, X, Z) = simulate_droplet_shape(R0, ca_target, dimensionless_result=True)
         vol = calculate_volume(X, Z, R0=R0)
-        return (vol-vol_target)/vol_target
+        return (vol - vol_target) / vol_target
 
     R0_guess = R0_guess or 1e-3   # Random guess
 
@@ -202,7 +201,7 @@ def solve_droplet_shape_for_height(
         height_target: float,
         ca_target: float = 180.0,
         R0_guess: Optional[float] = None,
-        ) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
+) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
     """Simulates droplet shape and optimizes the result for the given `vol_target`.
     Note that the shape cannot be calculated directly, but must be numerically
     searched, resulting in much longer run times than `simulate_droplet_shape`.
@@ -227,7 +226,7 @@ def solve_droplet_shape_for_height(
         R0 = x[0]
         (_, _, Z) = simulate_droplet_shape(R0, ca_target, dimensionless_result=False)
         height = Z[-1]
-        return float((height-height_target)/height_target)
+        return float((height - height_target) / height_target)
 
     R0_guess = R0_guess or 1e-3   # Random guess
 
