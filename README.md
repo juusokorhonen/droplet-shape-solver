@@ -40,15 +40,9 @@ Sometimes poetry might not read .python-version file but try to use the wrong ve
 
     poetry env use ~/.pyenv/versions/3.11.7/bin/python
 
-
 ## Developer installation
 
 If you want to develop this package, then you can install it locally in editable mode.
-
-### Using Makefile
-
-    make prepare-dev
-    make dev-install
 
 #### CPython 3.10.11
 
@@ -62,39 +56,28 @@ Regardless of the Python version, you should run these commands.
     cd /path/to/adsa
 
     python -V
-    >  Python 3.10.11
+    >  Python 3.11.7
 
-    python -m pip install --upgrade pip setuptools setuptools_scm virtualenv py-make build
-    python -m virtualenv venv
-    source venv/bin/activate   # Linux, MacOS
-    .\venv\Source\activate
-    python -m pip install -r requirements.txt -r requirements-tests.txt -r requirements-extras.txt
+    poetry install
+    poetry shell
 
 #### Install adsa in editable mode
 
-    python -m pip install -e /path/to/adsa
-
+Poetry install by default the current project.
 
 ### Windows and MinGW
 
-Make sure you have a proper Python installed with the `py` wrapper. Here, I assume version 3.7 of Python, but you can use a later one as well.
+Make sure you have a proper Python installed with the `py` wrapper. Here, I assume version 3.11 of Python, but you can use a later one as well.
 
 Run these commands in the root folder of the project (ie. the folder wher this README.md file is).
 
-    py -3.10 -m pip install --upgrade pip setuptools setuptools_scm virtualenv py-make build
-    py -3.10 -m virtualenv venv
-    source venv/Scripts/activate.  # git-bash
-    .\venv\Source\activate.        # windows terminal
-    python -m pip install -r requirements.txt -r requirements-tests.txt -r requirements-extras.txt
+    py -3.11 -m pip install --upgrade pip poetry
+    py -3.11 -m poetry install
+    py -3.11 -m poetry shell
 
-#### Install adsa in editable mode
+## Run demo
 
-    python -m pip install --editable /path/to/adsa
-
-## Run examples
-
-    python -m adsa.examples.droplet_shape_simulation
-    python -m adsa.examples.three_d_shape.py
+    python -m adsa.cli demo
 
 ## Run cli
 
@@ -108,25 +91,14 @@ Or:
 
 ## Run Jupyter notebook
 
-    $ jupyter notebook
+    poetry shell
+    cd notebook
+    jupyter notebook
 
 ## Testing installation
 
-The following commands are presented in pairs, which are mutually exclusive. Ie. use either one.
-
-    make tests
     python -m pytest
 
-    make lint
     python -m pytest --pycodestyle
 
-    make codestyle
     python -m flake8
-
-## Create a snapshot file
-
-    make snapshot
-
-## Create a distribution
-
-    make dist

@@ -10,14 +10,14 @@ import scipy as sp
 import numpy as np
 import numpy.typing as npt
 
-from adsa.analysis import calculate_volume
-from adsa.units import g, rho_water, rho_air, gamma_water
+from adsa.analysis import calculate_volume, estimate_radius_of_curvature
+import adsa.units as units
 
 
 @numba.jit(nopython=True)
 def adams_bashforth_derivative(
         phi: float,
-        Y: npt.NDArray[Any],
+        Y: npt.NDArray[np.float64],
         beta: float,
         alpha: float = 0.0,
         gamma: float = 2.0) -> npt.NDArray[Any]:
@@ -27,27 +27,31 @@ def adams_bashforth_derivative(
 
     Parameters
     ----------
-    phi: scalar (radians)
+    phi
         Integration parameter, angle calculated from vertical axis.
         This should be set to [0, ca] when calling the solver function.
-    Y: np.ndarray (n, )
+        Unit: radians
+    Y
         An array of dimensionless vectors `X` (dimensionless) = x/r,
         `Z` (dimensionless) = z/r, where r is the radius of curvature at the top
         of the droplet.
-    beta: scalar (dimensionless)
+        Unit: [dimensionless, dimensionless]
+    beta
         Dimensionless parameter, which describes the capillary length of the
         droplet. `beta` = drho * g * r^2 / sigma, where drho is the difference of
         densities of the liquid and vapour phases, g is gravitational constant,
         r is the radius of curvature at the top of the droplet, and sigma is the
         surface tension of the liquid. (Note. sigma is more specifically the
         surface tension on a planar surface.)
-    alpha: scalar (dimensionless), optional, default = 0.0
+        Unit: dimensionless
+    alpha (optional, default = 0.0)
         Dimensionless parameter, which relates the thickness of the interface
         "gamma" to the specific size, which is typically the radius of curvature
         at the top of the droplet. `alpha` = gamma / r. (Note: "gamma" here is not
         the surface tension). Note setting `alpha` = 0, will effectively ignore
         curvature dependence of surface tension.
-    gamma: scalar (dimensionless), optional, default = 2.0
+        Unit: dimensionless
+    gamma (optional, default = 2.0)
         Dimensionless parameter, which is calculated from `alpha`. It is the
         correction term to the Young-Laplace equation for highly curved
         surfaces.
@@ -58,6 +62,8 @@ def adams_bashforth_derivative(
         gamma = 2 / (1+2 * `alpha`). Note: when `alpha` = 0 (ie. ignoring
         curvature dependence of surface tension), `gamma` = 2. These values can
         be used as defaults, when `delta` is unknown.
+
+        Unit: dimensionless
 
     Returns
     -------
@@ -86,7 +92,7 @@ def adams_bashforth_derivative(
     """
     (X, Z) = Y   # non-dimensional coordinates
 
-    k1 = gamma + beta * Z
+    k1 = gamma + beta * Z   # dimensionless
     sinphi = np.sin(phi)
     cosphi = np.cos(phi)
     K = X * (1 - alpha * k1) / (k1 * X - (1 - alpha * k1) * sinphi) \
@@ -103,30 +109,44 @@ def simulate_droplet_shape(
         ca_target: float = 180.0,
         *,
         n_steps: Optional[int] = None,
-        dimensionless_result: bool = False,
-        g: float = g.to("m/s^2"),
-        gamma_liquid: float = gamma_water.to("N/m"),
-        rho_liquid: float = rho_water.to("kg/m^3"),
-        rho_vapour: float = rho_air.to("kg/m^3")
+        g: float = units.g,
+        gamma_liquid: float = units.gamma_water,
+        rho_liquid: float = units.rho_water,
+        rho_vapour: float = units.rho_air
 ) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
     """Simulates droplet shape using Young-Laplace differential equations in the
     axisymmetric case.
 
     Parameters
     ----------
-    R0: scalar (unit: meters)
+    R0
         Radius of curvature at the top of the droplet.
-    ca_target: scalar (unit: degrees)
+        Unit: meters
+    ca_target
         Targeted contact angle. Used to trigger events in the solver.
-    dimensionless_result
-        If True, then returns results in dimensionless format.
+        Unit: degrees
+    n_steps
+        The number of intervals between CA 0° and ca_target. If None, then solver 
+        fills in this value automatically.
+    g
+        The gravitational constant.
+        Unit: m/s^2
+    gamma_liquid
+        Surface tension of the liquid.
+        Unit: N/m
+    rho_liquid
+        The density of the liquid phase.
+        Unit: kg/m^3
+    rho_vapour
+        The density of the vapour phase.
+        Unit: kg/m^3
 
     Returns
     -------
     (alphas, xs, zs)
-        `alphas` : NDArray of points where the function was evaluated
-        `xs` : NDArray of x-coordinates.
-        `zs` : NDArray of z-coordinates.
+        `alphas` : NDArray of points where the function was evaluated, unit: degrees
+        `xs` : NDArray of x-coordinates, unit: meters
+        `zs` : NDArray of z-coordinates, unit: meters
     """
     ca_target = np.deg2rad(ca_target)   # Convert to radians
 
@@ -147,13 +167,15 @@ def simulate_droplet_shape(
         t_eval=t_eval,
         args=(beta, alpha, gamma), method='BDF')
 
-    return result.t, result.y[0], result.y[1]
+    return np.rad2deg(result.t), result.y[0], result.y[1]
 
 
-def solve_droplet_shape_for_volume(
+def simulate_droplet_shape_for_volume(
         vol_target: float,
         ca_target: float = 180.0,
-        R0_guess: Optional[float] = None
+        R0_guess: Optional[float] = None,
+        *,
+        n_steps: Optional[int] = None,
 ) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
     """Simulates droplet shape and optimizes the result for the given `vol_target`.
     Note that the shape cannot be calculated directly, but must be numerically
@@ -165,6 +187,8 @@ def solve_droplet_shape_for_volume(
         The target volume.
     ca_target (unit: degrees)
         The targeted contact angle.
+    n_steps
+        The number of intervals between CA 0° and ca_target.
     **kwargs
         See documentation for `simulate_droplet_shape`.
 
@@ -177,11 +201,11 @@ def solve_droplet_shape_for_volume(
     """
     def residual_fun(x: tuple[float], *args, **kwargs) -> float:
         R0 = x[0]
-        (_, X, Z) = simulate_droplet_shape(R0, ca_target, dimensionless_result=True)
+        (_, X, Z) = simulate_droplet_shape(R0, ca_target, n_steps=n_steps)
         vol = calculate_volume(X, Z, R0=R0)
         return (vol - vol_target) / vol_target
 
-    R0_guess = R0_guess or 1e-3   # Random guess
+    R0_guess = R0_guess or 1e-3
 
     result: sp.optimize.OptimizeResult = sp.optimize.least_squares(
         fun=residual_fun,
@@ -194,13 +218,15 @@ def solve_droplet_shape_for_volume(
     )
 
     R0 = float(result.x[0])
-    return simulate_droplet_shape(R0, ca_target)
+    return simulate_droplet_shape(R0, ca_target, n_steps=n_steps)
 
 
-def solve_droplet_shape_for_height(
+def simulate_droplet_shape_for_height(
         height_target: float,
         ca_target: float = 180.0,
         R0_guess: Optional[float] = None,
+        *,
+        n_steps: Optional[int] = None,
 ) -> tuple[npt.NDArray[Any], npt.NDArray[Any], npt.NDArray[Any]]:
     """Simulates droplet shape and optimizes the result for the given `vol_target`.
     Note that the shape cannot be calculated directly, but must be numerically
@@ -208,23 +234,25 @@ def solve_droplet_shape_for_height(
 
     Parameters
     ----------
-    height_target (unit: m)
+    height_target
         The target height.
-    ca_target (unit: degrees)
+        Unit: m
+    ca_target
         The targeted contact angle.
-    **kwargs
-        See documentation for `simulate_droplet_shape`.
+        Unit: degrees
+    n_steps
+        The number of intervals between CA 0° and ca_target.
 
     Returns
     -------
     (alphas, xs, zs)
-        `alphas` : NDArray of points where the function was evaluated
-        `xs` : NDArray of x-coordinates.
-        `zs` : NDArray of z-coordinates.
+        `alphas` : NDArray of points where the function was evaluated, unit: degrees
+        `xs` : NDArray of x-coordinates, unit: m
+        `zs` : NDArray of z-coordinates, unit: m.
     """
     def residual_fun(x: tuple[float, float], *args, **kwargs) -> float:
         R0 = x[0]
-        (_, _, Z) = simulate_droplet_shape(R0, ca_target, dimensionless_result=False)
+        (_, _, Z) = simulate_droplet_shape(R0, ca_target, n_steps=n_steps)
         height = Z[-1]
         return float((height - height_target) / height_target)
 
@@ -241,4 +269,4 @@ def solve_droplet_shape_for_height(
     )
 
     R0 = float(result.x[0])
-    return simulate_droplet_shape(R0, ca_target)
+    return simulate_droplet_shape(R0, ca_target, n_steps=n_steps)

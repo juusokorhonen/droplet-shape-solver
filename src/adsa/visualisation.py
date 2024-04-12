@@ -4,24 +4,39 @@
 This file provides functions for easily creating standard visualizations from
 the simulated water droplet shapes.
 """
+from typing import Optional
+
 import numpy as np
+import numpy.typing as npt
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 from adsa import analysis
 from adsa import threed
 
 
-def plot_drop(x, z, ca, *, color='k', label=None, ax=None, scale=None, style=1, show=True):
+def plot_drop(
+        x: npt.NDArray[np.float64],
+        z: npt.NDArray[np.float64],
+        *,
+        x_axis_unit: str = "m",
+        z_axis_unit: str = "m",
+        color: str = 'k',
+        label: str = None,
+        ax: mpl.axes.Axes = None,
+        scale: float | None = None,
+        style: int = 1,
+        show: bool = True):
     """Plots the given drop shape.
 
     Parameters
     ----------
     x: np.ndarray
         Droplet x coordinates
+        Unit: User selectable, see x_axis_unit
     z: np.ndarray
         Droplet y coordinates
-    ca: float
-        Contact angle of the droplet.
+        Unit: User selectable, see z_axis_unit
     color: str_like (optional, default: 'k', ie. black)
         Color to use for plotting
     label: str (optional)
@@ -58,15 +73,8 @@ def plot_drop(x, z, ca, *, color='k', label=None, ax=None, scale=None, style=1, 
                 mew=1.0, label=label)
         ax.axhline(0, ls='--', color='k')
 
-        ax.set_xlabel("mm")
-        ax.set_ylabel("mm")
-
-        volume = analysis.calculate_volume(x, z)
-        ax.text(0.5, 0.5, u"Contact angle: {:.4}\nVolume: {:.4} uL".format(
-                ca, volume * 1e9),
-                horizontalalignment='center',
-                verticalalignment='center',
-                transform=ax.transAxes)
+        ax.set_xlabel(x_axis_unit)
+        ax.set_ylabel(z_axis_unit)
 
     elif style == 2:
         z_reflection = -z * 0.25
