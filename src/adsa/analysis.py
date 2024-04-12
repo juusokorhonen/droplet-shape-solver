@@ -12,23 +12,26 @@ import numpy.typing as npt
 
 
 def calculate_volume(
-        X: npt.NDArray[Any],
-        Z: npt.NDArray[Any],
+        X: npt.NDArray[np.float64],
+        Z: npt.NDArray[np.float64],
         R0: Optional[float] = None) -> float:
     """Calculates the volume associated to the `x`, and `z` coordinates by
     assuming an axisymmetric shape.
 
     Parameters
     ----------
-    X : NDArray (possibly dimensionless)
+    X
         X coordinates of the droplet.
-    Z : NDArray (possibly dimensionless)
+        Unit: see 'R0'
+    Z
         Y coordinates of the droplet.
-    R0 : float (optional, unit: m, default: None)
+        Unit: see 'R0'
+    R0 (optional, unit: m, default: None)
         Radius of curvature of the droplet at the apex. If this value is set,
         then `X` and `Z` are assumed to be dimensionless coordinates
         `X` = x/`R0`, `Z` = z/`R0` and the calculations are modified
         accordingly.
+        Unit: m
 
     Returns
     -------
